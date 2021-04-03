@@ -1,0 +1,11 @@
+body {
+  text-align: center;
+}
+
+button {
+  min-width: 100px;
+}
+
+button+button {
+  margin-left: 10px;
+}

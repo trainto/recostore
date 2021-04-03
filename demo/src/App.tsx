@@ -7,12 +7,18 @@ import './App.css';
 
 const App = () => {
   return (
-    <CounterStore.Provider>
+    <>
+      <h1>ReCoStore demo</h1>
+      <hr />
       <NameStore.Provider>
         <Name />
-        <Counter />
       </NameStore.Provider>
-    </CounterStore.Provider>
+      <hr />
+      <CounterStore.Provider>
+        <Counter />
+      </CounterStore.Provider>
+      <hr />
+    </>
   );
 };
 
