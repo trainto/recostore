@@ -1,40 +1,56 @@
-import { useState } from 'react';
-import { persist, PersistType } from '../utils/persist';
+import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { constructProxy, persist } from '../utils';
 
-const useMutableState = <V extends Record<string | symbol, unknown> | unknown[]>(
-  value: V,
+const useMutableState = <V extends ReCoStoreMutable>(
+  initialState: V,
   options?: { persist?: { key: string; type?: PersistType } }
-) => {
-  const handler = {
-    set: (obj: V, prop: string | symbol, value: unknown) => {
-      if (obj[prop] === value) {
-        return true;
-      }
+): [V, (state: V) => void] => {
+  const [updateCount, forceUpdate] = useReducer((current) => {
+    if (current >= Number.MAX_SAFE_INTEGER) {
+      return 0;
+    } else {
+      return current + 1;
+    }
+  }, 0);
 
-      obj[prop] = value;
-
-      if (options && options.persist) {
-        persist(options.persist.key, obj, options.persist.type);
-      }
-
-      setState(new Proxy(obj, handler));
-
-      return true;
-    },
-  };
-
-  let valueToUse = value;
-
-  if (options && options.persist) {
-    const saved = persist(options.persist.key, undefined, options.persist.type);
-    if (saved) {
-      valueToUse = saved;
+  const persistedRef = useRef(false);
+  let initialStateOrSaved = initialState;
+  if (persistedRef.current === false) {
+    if (options && options.persist) {
+      persistedRef.current = true;
+      initialStateOrSaved =
+        persist(options.persist.key, undefined, options.persist.type) || initialState;
     }
   }
 
-  const [state, setState] = useState(new Proxy(valueToUse, handler));
+  const proxyRef = useRef<V>(null);
+  const dispatcherRef = useRef<ReCoStoreDispatcher>(null);
+  if (proxyRef.current === null || dispatcherRef.current === null) {
+    const [proxy, dispatcher] = constructProxy(initialStateOrSaved);
+    proxyRef.current = proxy;
+    dispatcherRef.current = dispatcher;
+    if (dispatcherRef.current) {
+      dispatcherRef.current.dispatch = () => forceUpdate();
+    }
+  }
 
-  return state;
+  useEffect(() => {
+    if (options && options.persist && proxyRef.current) {
+      persist(options.persist.key, proxyRef.current, options.persist.type);
+    }
+  }, [options, updateCount]);
+
+  const reset = useCallback((anotherState: V) => {
+    const [proxy, dispatcher] = constructProxy(anotherState);
+    proxyRef.current = proxy;
+    dispatcherRef.current = dispatcher;
+    if (dispatcherRef.current) {
+      dispatcherRef.current.dispatch = () => forceUpdate();
+    }
+    forceUpdate();
+  }, []);
+
+  return [proxyRef.current, reset];
 };
 
 export default useMutableState;

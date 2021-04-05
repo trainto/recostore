@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { persist, PersistType } from '../utils/persist';
+import { persist } from '../utils';
 
 const useStatePersist = <V extends unknown>(
   value: V,
