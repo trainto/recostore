@@ -1,11 +1,11 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { persist } from '../utils';
 
-const useStatePersist = <V extends unknown>(
-  value: V,
+const useStatePersist = <S extends unknown>(
+  value: S,
   key: string,
   type: PersistType = 'local'
-): [V, (newValue: V) => void] => {
+): [S, (newValue: S) => void] => {
   const [state, setState] = useState(value);
 
   useEffect(() => {
@@ -15,12 +15,12 @@ const useStatePersist = <V extends unknown>(
     }
   }, [key, type]);
 
-  const setPersist = (newValue: V) => {
+  const setStatePersist = (newValue: React.SetStateAction<S>) => {
     setState(newValue);
     persist(key, newValue, type);
   };
 
-  return [state, setPersist];
+  return [state, setStatePersist];
 };
 
 export default useStatePersist;
