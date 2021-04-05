@@ -24,7 +24,7 @@ export const persist = (key: string, value: unknown, type: PersistType = 'local'
 export const constructProxy = (() => {
   const symbol = Symbol('ReCoStoreProxy');
 
-  const isRecostoreMutable = (obj: unknown): obj is ReCoStoreMutable => {
+  const isRecostoreMutable = (obj: unknown): obj is RecoMutable => {
     if (typeof obj === 'object' && obj !== null) {
       return true;
     } else {
@@ -32,22 +32,19 @@ export const constructProxy = (() => {
     }
   };
 
-  const searchInsideAndWrap = (
-    target: ReCoStoreMutable,
-    handler: ProxyHandler<ReCoStoreMutable>
-  ) => {
+  const searchInsideAndWrap = (target: RecoMutable, handler: ProxyHandler<RecoMutable>) => {
     if (Array.isArray(target)) {
       for (let i = 0; i < target.length; i += 1) {
         if (isRecostoreMutable(target[i])) {
-          searchInsideAndWrap(target[i] as ReCoStoreMutable, handler);
-          target[i] = new Proxy(target[i] as ReCoStoreMutable, handler);
+          searchInsideAndWrap(target[i] as RecoMutable, handler);
+          target[i] = new Proxy(target[i] as RecoMutable, handler);
         }
       }
     } else {
       for (const prop in target) {
         if (isRecostoreMutable(target[prop])) {
-          searchInsideAndWrap(target[prop] as ReCoStoreMutable, handler);
-          target[prop] = new Proxy(target[prop] as ReCoStoreMutable, handler);
+          searchInsideAndWrap(target[prop] as RecoMutable, handler);
+          target[prop] = new Proxy(target[prop] as RecoMutable, handler);
         }
       }
     }
@@ -61,8 +58,8 @@ export const constructProxy = (() => {
     this.dispatch && this.dispatch();
   };
 
-  const construct = <T extends ReCoStoreMutable>(target: T): [T | null, ReCoStoreDispatcher] => {
-    const dispatcher: ReCoStoreDispatcher = new RecostoreDispatcher();
+  const construct = <T extends RecoMutable>(target: T): [T | null, RecoMutableDispatcher] => {
+    const dispatcher: RecoMutableDispatcher = new RecostoreDispatcher();
 
     if (target[symbol] === 1) {
       return [null, dispatcher];

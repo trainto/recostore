@@ -1,3 +1,3 @@
-type ReCoStoreMutable = Record<string, unknown> | unknown[];
+type RecoMutable = Record<string, unknown> | unknown[];
+type RecoMutableDispatcher = { dispatch: () => void };
 type PersistType = 'local' | 'session';
-type ReCoStoreDispatcher = { dispatch: () => void };

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { constructProxy, persist } from '../utils';
 
-const useMutableState = <V extends ReCoStoreMutable>(
+const useMutableState = <V extends RecoMutable>(
   initialState: V,
   options?: { persist?: { key: string; type?: PersistType } }
 ): [V, (state: V) => void] => {
@@ -24,7 +24,7 @@ const useMutableState = <V extends ReCoStoreMutable>(
   }
 
   const proxyRef = useRef<V>(null);
-  const dispatcherRef = useRef<ReCoStoreDispatcher>(null);
+  const dispatcherRef = useRef<RecoMutableDispatcher>(null);
   if (proxyRef.current === null || dispatcherRef.current === null) {
     const [proxy, dispatcher] = constructProxy(initialStateOrSaved);
     proxyRef.current = proxy;
