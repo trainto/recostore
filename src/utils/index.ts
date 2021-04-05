@@ -62,7 +62,6 @@ export const constructProxy = (() => {
   };
 
   const construct = <T extends ReCoStoreMutable>(target: T): [T | null, ReCoStoreDispatcher] => {
-    console.log('hehe');
     const dispatcher: ReCoStoreDispatcher = new RecostoreDispatcher();
 
     if (target[symbol] === 1) {
