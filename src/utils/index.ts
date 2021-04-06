@@ -1,7 +1,3 @@
-export const isArray = (obj: unknown): obj is unknown[] => {
-  return Array.isArray(obj);
-};
-
 export const persist = (key: string, value: unknown, type: PersistType = 'local') => {
   const storage = type === 'session' ? sessionStorage : localStorage;
   if (value === undefined) {
@@ -19,27 +15,30 @@ export const persist = (key: string, value: unknown, type: PersistType = 'local'
 export const constructProxy = (() => {
   const symbol = Symbol('ReCoStoreProxy');
 
-  const isRecostoreMutable = (obj: unknown): obj is RecoMutable => {
-    if (typeof obj === 'object' && obj !== null) {
+  const isRecostoreMutable = (obj: unknown): obj is Record<string, unknown> | unknown[] => {
+    if (typeof obj === 'object' && typeof obj !== 'function' && obj !== null) {
       return true;
     } else {
       return false;
     }
   };
 
-  const searchInsideAndWrap = (target: RecoMutable, handler: ProxyHandler<RecoMutable>) => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const searchInsideAndWrap = <T extends object>(target: T, handler: ProxyHandler<object>) => {
     if (Array.isArray(target)) {
       for (let i = 0; i < target.length; i += 1) {
         if (isRecostoreMutable(target[i])) {
-          searchInsideAndWrap(target[i] as RecoMutable, handler);
-          target[i] = new Proxy(target[i] as RecoMutable, handler);
+          searchInsideAndWrap(target[i], handler);
+          target[i] = new Proxy(target[i], handler);
         }
       }
     } else {
       for (const prop in target) {
         if (isRecostoreMutable(target[prop])) {
-          searchInsideAndWrap(target[prop] as RecoMutable, handler);
-          target[prop] = new Proxy(target[prop] as RecoMutable, handler);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          searchInsideAndWrap(target[prop] as any, handler);
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          target[prop] = new Proxy(target[prop] as any, handler);
         }
       }
     }
@@ -49,35 +48,39 @@ export const constructProxy = (() => {
     dispatch = null;
   }
 
-  const construct = <T extends RecoMutable>(target: T): [T | null, RecoMutableDispatcher] => {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  const construct = <T extends Record<string, unknown> | unknown[], K extends keyof T>(
+    target: T
+  ): [T, RecoMutableDispatcher] => {
     const dispatcher: RecoMutableDispatcher = new RecostoreDispatcher();
 
-    if (target[symbol] === 1) {
-      return [null, dispatcher];
+    if (isRecostoreMutable(target) === false || (target as { [symbol]?: number })[symbol] === 1) {
+      return [target, dispatcher];
     }
 
-    target[symbol] = 1;
+    (target as { [symbol]?: number })[symbol] === 1;
 
-    const handler = {
-      set: (obj: T, prop: string, value: unknown) => {
-        if (obj[prop] === value) {
+    const handler: ProxyHandler<T> = {
+      set: (obj, prop, value) => {
+        if (obj[prop as K] === value) {
           return true;
         }
 
-        if (isRecostoreMutable(value) && value[symbol] !== 1) {
+        if (isRecostoreMutable(value) && (value as { [symbol]?: number })[symbol] !== 1) {
           searchInsideAndWrap(value, handler);
-          value[symbol] = 1;
-          obj[prop] = new Proxy(value, handler);
+          (target as { [symbol]?: number })[symbol] === 1;
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          obj[prop as K] = new Proxy(value as any, handler);
         } else {
-          obj[prop] = value;
+          obj[prop as K] = value;
         }
         dispatcher.dispatch && dispatcher.dispatch();
 
         return true;
       },
-      deleteProperty: (obj: T, prop: string) => {
+      deleteProperty: (obj, prop) => {
         if (prop in obj) {
-          delete obj[prop];
+          delete obj[prop as K];
         } else {
           return false;
         }
@@ -85,7 +88,7 @@ export const constructProxy = (() => {
 
         return true;
       },
-      ownKeys: (obj: T) => {
+      ownKeys: (obj) => {
         return Reflect.ownKeys(obj).filter((key) => key !== symbol);
       },
     };

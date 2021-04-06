@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { constructProxy, persist } from '../utils';
 
-const useMutableState = <V extends RecoMutable>(
+const useMutableState = <V extends unknown[] | Record<string, unknown>>(
   initialState: V,
   options?: { persist?: { key: string; type?: PersistType } }
 ): [V, (state: V) => void] => {
@@ -23,15 +23,15 @@ const useMutableState = <V extends RecoMutable>(
     }
   }
 
-  const proxyRef = useRef<V | null>(null);
-  const dispatcherRef = useRef<RecoMutableDispatcher | null>(null);
-  if (proxyRef.current === null || dispatcherRef.current === null) {
-    const [proxy, dispatcher] = constructProxy(initialStateOrSaved);
+  const tryProxy = useCallback((stateToProxy) => {
+    const [proxy, dispatcher] = constructProxy(stateToProxy);
     proxyRef.current = proxy;
-    dispatcherRef.current = dispatcher;
-    if (dispatcherRef.current) {
-      dispatcherRef.current.dispatch = () => forceUpdate();
-    }
+    dispatcher.dispatch = () => forceUpdate();
+  }, []);
+
+  const proxyRef = useRef<V>(initialStateOrSaved);
+  if (proxyRef.current === initialStateOrSaved) {
+    tryProxy(initialStateOrSaved);
   }
 
   useEffect(() => {
@@ -40,19 +40,13 @@ const useMutableState = <V extends RecoMutable>(
     }
   }, [options, updateCount]);
 
-  const reset = useCallback((anotherState: V) => {
-    const [proxy, dispatcher] = constructProxy(anotherState);
-    proxyRef.current = proxy;
-    dispatcherRef.current = dispatcher;
-    if (dispatcherRef.current) {
-      dispatcherRef.current.dispatch = () => forceUpdate();
-    }
-    forceUpdate();
-  }, []);
-
-  if (proxyRef.current === null) {
-    throw new Error('Proxy has not been built! Something went wrong!');
-  }
+  const reset = useCallback(
+    (anotherState: V) => {
+      tryProxy(anotherState);
+      forceUpdate();
+    },
+    [tryProxy]
+  );
 
   return [proxyRef.current, reset];
 };
