@@ -23,8 +23,8 @@ const useMutableState = <V extends RecoMutable>(
     }
   }
 
-  const proxyRef = useRef<V>(null);
-  const dispatcherRef = useRef<RecoMutableDispatcher>(null);
+  const proxyRef = useRef<V | null>(null);
+  const dispatcherRef = useRef<RecoMutableDispatcher | null>(null);
   if (proxyRef.current === null || dispatcherRef.current === null) {
     const [proxy, dispatcher] = constructProxy(initialStateOrSaved);
     proxyRef.current = proxy;
@@ -49,6 +49,10 @@ const useMutableState = <V extends RecoMutable>(
     }
     forceUpdate();
   }, []);
+
+  if (proxyRef.current === null) {
+    throw new Error('Proxy has not been built! Something went wrong!');
+  }
 
   return [proxyRef.current, reset];
 };
