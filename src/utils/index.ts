@@ -3,22 +3,17 @@ export const isArray = (obj: unknown): obj is unknown[] => {
 };
 
 export const persist = (key: string, value: unknown, type: PersistType = 'local') => {
-  switch (type) {
-    case 'local':
-      if (value === undefined) {
-        return JSON.parse(localStorage.getItem(key));
-      }
-      localStorage.setItem(key, JSON.stringify(value));
-      return value;
-    case 'session':
-      if (value === undefined) {
-        return JSON.parse(sessionStorage.getItem(key));
-      }
-      sessionStorage.setItem(key, JSON.stringify(value));
-      return value;
-    default:
-      throw new TypeError(`Persist type must be 'local' or 'session`);
+  const storage = type === 'session' ? sessionStorage : localStorage;
+  if (value === undefined) {
+    const loaded = storage.getItem(key);
+    if (loaded) {
+      return JSON.parse(loaded);
+    }
+
+    return loaded;
   }
+
+  storage.setItem(key, JSON.stringify(value));
 };
 
 export const constructProxy = (() => {
