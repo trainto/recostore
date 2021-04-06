@@ -45,13 +45,9 @@ export const constructProxy = (() => {
     }
   };
 
-  function RecostoreDispatcher() {
-    this.dispatch = null;
+  class RecostoreDispatcher implements RecoMutableDispatcher {
+    dispatch = null;
   }
-
-  RecostoreDispatcher.prototype.dispatch = function () {
-    this.dispatch && this.dispatch();
-  };
 
   const construct = <T extends RecoMutable>(target: T): [T | null, RecoMutableDispatcher] => {
     const dispatcher: RecoMutableDispatcher = new RecostoreDispatcher();
@@ -75,7 +71,7 @@ export const constructProxy = (() => {
         } else {
           obj[prop] = value;
         }
-        dispatcher.dispatch();
+        dispatcher.dispatch && dispatcher.dispatch();
 
         return true;
       },
@@ -85,7 +81,7 @@ export const constructProxy = (() => {
         } else {
           return false;
         }
-        dispatcher.dispatch();
+        dispatcher.dispatch && dispatcher.dispatch();
 
         return true;
       },
