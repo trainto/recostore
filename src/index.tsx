@@ -1,5 +1,5 @@
 import createStore from './recostore';
 import useMutableState from './hooks/use-mutable-state';
-import useStatePersist from './hooks/use-state-persist';
+import usePersistedState from './hooks/use-persisted-state';
 
-export { createStore, useMutableState, useStatePersist };
+export { createStore, useMutableState, usePersistedState };

@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useReducer, useRef } from 'react';
 import { constructProxy, persist } from '../utils';
 
-const useMutableState = <V extends unknown[] | Record<string, unknown>>(
-  initialState: V,
+const useMutableState = <S extends unknown[] | Record<string, unknown>>(
+  initialState: S,
   options?: { persist?: { key: string; type?: PersistType } }
-): [V, (state: V) => void] => {
+): [S, (state: S) => void] => {
   const [updateCount, forceUpdate] = useReducer((current) => {
     if (current >= Number.MAX_SAFE_INTEGER) {
       return 0;
@@ -29,7 +29,7 @@ const useMutableState = <V extends unknown[] | Record<string, unknown>>(
     dispatcher.dispatch = () => forceUpdate();
   }, []);
 
-  const proxyRef = useRef<V>(initialStateOrSaved);
+  const proxyRef = useRef<S>(initialStateOrSaved);
   if (proxyRef.current === initialStateOrSaved) {
     tryProxy(initialStateOrSaved);
   }
@@ -41,7 +41,7 @@ const useMutableState = <V extends unknown[] | Record<string, unknown>>(
   }, [options, updateCount]);
 
   const reset = useCallback(
-    (anotherState: V) => {
+    (anotherState: S) => {
       tryProxy(anotherState);
       forceUpdate();
     },

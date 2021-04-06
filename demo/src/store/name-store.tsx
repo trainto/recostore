@@ -1,7 +1,7 @@
-import { createStore, useStatePersist } from '../../../src';
+import { createStore, usePersistedState } from '../../../src';
 
 const useName = () => {
-  const [name, persistName] = useStatePersist('', 'name');
+  const [name, persistName] = usePersistedState('', 'name');
 
   const setName = (name: string) => {
     persistName(name);
