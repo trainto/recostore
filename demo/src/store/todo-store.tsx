@@ -12,18 +12,22 @@ const useTodo = () => {
 
   const add = () => {
     todos.push({ done: false, task: '' });
-    // resetTodos([
-    //   { done: false, task: 'wow' },
-    //   { done: true, task: 'done' },
-    // ]);
   };
 
   const toggle = (index: number) => {
     todos[index].done = !todos[index].done;
   };
 
-  const editTask = (index: number, task: string) => {
+  const edit = (index: number, task: string) => {
     todos[index].task = task;
+  };
+
+  const remove = (index: number) => {
+    todos.splice(index, 1);
+  };
+
+  const clearAll = () => {
+    resetTodos([]);
   };
 
   return {
@@ -31,7 +35,9 @@ const useTodo = () => {
 
     add,
     toggle,
-    editTask,
+    edit,
+    remove,
+    clearAll,
   };
 };
 

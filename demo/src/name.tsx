@@ -8,7 +8,9 @@ const Name = () => {
 
   return (
     <div>
-      <h2>Hello, {nameStore.name}.</h2>
+      <h2>Name</h2>
+      <small>Test for state persistence.</small>
+      <h3>Hello, {nameStore.name}.</h3>
       <div>
         {editing && (
           <input
@@ -20,7 +22,6 @@ const Name = () => {
         )}
         <button onClick={() => setEditing(!editing)}>{editing ? 'Submit' : 'Edit'}</button>
       </div>
-      <small>Test for state persistence.</small>
     </div>
   );
 };

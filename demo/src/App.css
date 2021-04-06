@@ -9,3 +9,7 @@ button {
 button+button {
   margin-left: 10px;
 }
+
+.btn-sm {
+  min-width: 50px;
+}
