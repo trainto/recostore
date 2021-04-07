@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { persist } from '../utils';
 
-const useStatePersist = <S extends unknown>(
+const usePersistedState = <S extends unknown>(
   value: S,
   key: string,
   type: PersistType = 'local'
@@ -15,12 +15,15 @@ const useStatePersist = <S extends unknown>(
     }
   }, [key, type]);
 
-  const setStatePersist = (newValue: React.SetStateAction<S>) => {
-    setState(newValue);
-    persist(key, newValue, type);
-  };
+  const setPersistedState = useCallback(
+    (newValue: React.SetStateAction<S>) => {
+      setState(newValue);
+      persist(key, newValue, type);
+    },
+    [key, type]
+  );
 
-  return [state, setStatePersist];
+  return [state, setPersistedState];
 };
 
-export default useStatePersist;
+export default usePersistedState;
