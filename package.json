@@ -2,12 +2,24 @@
   "name": "recostore",
   "version": "0.1.0",
   "description": "React state management using Context",
-  "main": "index.js",
+  "source": "./src/index.ts",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.modern.js",
+  "module": "./dist/index.module.js",
+  "unpkg": "./dist/index.umd.js",
+  "types": "./dist/index.d.ts",
+  "amdName": "ReCoStore",
+  "sideEffects": false,
   "author": "Hakjoon Sim <trainto@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "dev": "vite ./demo"
+    "dev": "vite ./demo",
+    "build": "rm -rf dist && microbundle --external react --globals react=React --strict --no-compress --jsx React.createElement"
   },
+  "keywords": [
+    "react",
+    ""
+  ],
   "devDependencies": {
     "@types/react": "^17.0.3",
     "@types/react-dom": "^17.0.3",
@@ -18,6 +30,7 @@
     "eslint-plugin-prettier": "^3.3.1",
     "eslint-plugin-react": "^7.23.1",
     "eslint-plugin-react-hooks": "^4.2.0",
+    "microbundle": "^0.13.0",
     "prettier": "^2.2.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
