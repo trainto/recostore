@@ -1,0 +1,5 @@
+demo/
+tsconfig.json
+.vscode/
+.eslintrc.json
+.prettierrc.json
