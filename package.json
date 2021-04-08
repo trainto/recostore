@@ -1,6 +1,6 @@
 {
   "name": "recostore",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "React state management using Context",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
@@ -10,8 +10,15 @@
   "types": "./dist/index.d.ts",
   "amdName": "ReCoStore",
   "sideEffects": false,
-  "author": "Hakjoon Sim <trainto@gmail.com>",
+  "author": "Hakjoon Sim <you@heyjoon.dev>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/trainto/recostore.git"
+  },
+  "bugs": {
+    "url": "https://github.com/trainto/recostore/issues"
+  },
   "scripts": {
     "dev": "vite ./demo",
     "build": "rm -rf dist && microbundle --external react --globals react=React --strict --no-compress --jsx React.createElement"
