@@ -1,6 +1,6 @@
 {
   "name": "recostore",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React state management using Context",
   "source": "./src/index.ts",
   "main": "./dist/index.js",
